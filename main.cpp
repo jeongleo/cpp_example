@@ -1,7 +1,7 @@
 /*
- * Banking System Ver 0.1
+ * Banking System Ver 0.2
  * 작성자: 정민호
- * 내 용: OPP 단계별 프로젝트의 기본 틀 구성
+ * 내 용: Account 클래스 정의, 객체 포인터 배열 적용
  * 참 고: 윤성우, 열혈 C++ 프로그래밍
  */
 #include <iostream>
@@ -18,14 +18,57 @@ void showAllAccInfo(void);	// 잔액조회
 
 enum {MAKE=1, DEPOSIT, WITHDRAW, INQUIRE, EXIT};
 
-typedef struct
-{
-	int accID; // 계좌번호
-	int balance; // 잔액
-	char cusName[NAME_LEN]; // 고객이름
-} Account;
 
-Account accArr[100]; // Account array
+class Account
+{
+private:
+    int accID; // 계좌번호
+	int balance; // 잔액
+	char * cusName; // 고객이름
+
+public:
+    Account(int ID, int money, char * name)
+        : accID(ID), balance(money)
+    {
+        cusName = new char[strlen(name) + 1];
+        strcpy(cusName, name);
+    }
+    
+    int getAccID()
+    {
+        return accID;
+    }
+    
+    void deposit(int money)
+    {
+        balance += money;
+    }
+    
+    int withdraw(int money)
+    {
+        if(balance < money)
+        {
+            return 0;
+        }
+        balance -= money;
+        return money;
+    }
+    
+    void showAccInfo()
+    {
+        cout << "계좌ID : " << accID << endl;
+        cout << "이 름  : " << cusName << endl;
+        cout << "잔 액  : " << balance << endl;
+    }
+    
+    ~Account()
+    {
+        delete []cusName;
+    }
+};
+
+
+Account * accArr[100]; // Account array
 int accNum = 0; // number of saved Account
 
 
@@ -55,6 +98,10 @@ int main(void)
 				showAllAccInfo();
 				break;
 			case EXIT:
+			    for(int i=0; i<accNum; i++)
+			    {
+			        delete accArr[i];
+			    }
 				return 0;
 			default:
 				cout << "Illegal selection.." << endl;
@@ -65,7 +112,6 @@ int main(void)
 
 void showMenu()
 {
-	cout << endl;
 	cout << "-----Menu-----" << endl;
 	cout << "1. 계좌개설" << endl;
 	cout << "2. 입 금" << endl;
@@ -84,12 +130,8 @@ void makeAccount()
 	cout << "계좌ID: "; cin >> id;
 	cout << "이 름: "; cin >> name;
 	cout << "입금액: "; cin >> balance;
-	cout << endl;
 	
-	accArr[accNum].accID = id;
-	accArr[accNum].balance = balance;
-	strcpy(accArr[accNum].cusName, name);
-	accNum++;
+	accArr[accNum++] = new Account(id, balance, name);
 }
 
 void depositMoney()
@@ -103,14 +145,14 @@ void depositMoney()
 	
 	for(int i=0; i<accNum; i++)
 	{
-		if(accArr[i].accID == id)
+		if(accArr[i]->getAccID() == id)
 		{
-			accArr[i].balance += money;
-			cout << "입금완료" << endl;
+			accArr[i]->deposit(money);
+			cout << "입금완료" << endl << endl;
 			return;
 		}
 	}
-	cout << "유효하지 않은 ID 입니다." << endl;
+	cout << "유효하지 않은 ID 입니다." << endl << endl;
 }
 
 void withdrawMoney()
@@ -124,28 +166,25 @@ void withdrawMoney()
 	
 	for(int i=0; i<accNum; i++)
 	{
-		if(accArr[i].accID == id)
+		if(accArr[i]->getAccID() == id)
 		{
-			if(accArr[i].balance < money)
+			if(accArr[i]->withdraw(money) == 0)
 			{
-				cout << "잔액부족" << endl;
+				cout << "잔액부족" << endl << endl;
 				return;
 			}
-			accArr[i].balance -= money;
-			cout << "출금완료" << endl;
+			cout << "출금완료" << endl << endl;
 			return;
 		}
 	}
-	cout << "유효하지 않은 ID 입니다." << endl;
+	cout << "유효하지 않은 ID 입니다." << endl << endl;
 }
 
 void showAllAccInfo()
 {
-	cout << "계좌ID\t\t" << "이 름\t\t" << "잔 액\t\t" << endl;
 	for(int i=0; i<accNum; i++)
 	{
-		cout << accArr[i].accID << "\t\t";
-		cout << accArr[i].cusName << "\t\t";
-		cout << accArr[i].balance << endl;
+		accArr[i]->showAccInfo();
+		cout << endl;
 	}
 }
