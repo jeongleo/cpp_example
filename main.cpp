@@ -34,6 +34,13 @@ public:
         strcpy(cusName, name);
     }
     
+    Account(const Account & ref)
+        : accID(ref.accID), balance(ref.balance)
+    {
+        cusName = new char[strlen(ref.cusName) + 1];
+        strcpy(cusName, ref,cusName);
+    }
+    
     int getAccID()
     {
         return accID;
