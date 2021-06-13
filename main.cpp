@@ -1,5 +1,5 @@
 /*
- * Banking System Ver 0.2
+ * Banking System Ver 0.4
  * 작성자: 정민호
  * 내 용: Account 클래스 정의, 객체 포인터 배열 적용
  * 참 고: 윤성우, 열혈 C++ 프로그래밍
@@ -41,10 +41,7 @@ public:
         strcpy(cusName, ref,cusName);
     }
     
-    int getAccID()
-    {
-        return accID;
-    }
+    int getAccID() const { return accID; }
     
     void deposit(int money)
     {
@@ -61,7 +58,7 @@ public:
         return money;
     }
     
-    void showAccInfo()
+    void showAccInfo() const
     {
         cout << "계좌ID : " << accID << endl;
         cout << "이 름  : " << cusName << endl;
